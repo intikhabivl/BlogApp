@@ -1,14 +1,14 @@
 package com.springboot.blog.controller;
 
-import com.springboot.blog.entity.Post;
+import com.springboot.blog.payload.CommentDto;
 import com.springboot.blog.payload.PostDto;
-import com.springboot.blog.service.impl.PostService;
+import com.springboot.blog.payload.PostResponse;
+import com.springboot.blog.service.PostService;
+import com.springboot.blog.util.AppConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -27,8 +27,13 @@ public class PostController {
     }
 
     @GetMapping
-    public List<PostDto> getAllPosts(){
-        return postService.getAllPosts();
+    public PostResponse getAllPosts(
+            @RequestParam(name = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NO, required = false) int pageNo,
+            @RequestParam(name = "pageSize", defaultValue = AppConstants.DEFAULT_PAGE_SIZE, required = false) int pageSize,
+            @RequestParam(name = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
+            @RequestParam(name = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
+    ){
+        return postService.getAllPosts(pageNo, pageSize,  sortBy, sortDir);
     }
 
     @GetMapping("/{id}")
@@ -37,7 +42,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostDto> updatePostById(@RequestBody PostDto postDto, @PathVariable("id") long id){
+    public ResponseEntity<PostDto> updatePostById(@PathVariable("id") long id, @RequestBody PostDto postDto){
 
         PostDto postResponse=postService.updatePostById(postDto, id);
         return new ResponseEntity<>(postResponse, HttpStatus.OK);
